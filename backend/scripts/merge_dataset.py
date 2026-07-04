@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Tuple
 
 @dataclass
 class MergeConfig:
+
     input_dir: str
     output_dir: str
     output_filename: str = "scam_dataset.json"
@@ -39,24 +40,96 @@ def _normalize_records(data: Any) -> List[Dict[str, Any]]:
     raise ValueError("Unsupported JSON format for records")
 
 
-def _dedupe(records: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
-    # Primary dedupe: by (source, title, text) if possible; else fallback to repr.
-    seen = set()
-    deduped = []
+def _normalize_text(s: Any) -> str:
+    if s is None:
+        return ""
+    if not isinstance(s, str):
+        s = str(s)
+    # Lowercase + collapse whitespace
+    return " ".join(s.lower().split())
 
-    duplicates = []
+
+def _jaccard_similarity(a: str, b: str) -> float:
+    # Token-based Jaccard similarity over whitespace tokens.
+    # Lightweight approximation to catch near-duplicates without embeddings.
+    ta = set(_normalize_text(a).split())
+    tb = set(_normalize_text(b).split())
+    if not ta and not tb:
+        return 1.0
+    if not ta or not tb:
+        return 0.0
+    inter = len(ta & tb)
+    union = len(ta | tb)
+    return inter / union if union else 0.0
+
+
+def _looks_like_duplicate(r1: Dict[str, Any], r2: Dict[str, Any], *, threshold: float) -> bool:
+    # Dedup logic:
+    # 1) Exact title+text match (after normalization)
+    # 2) High overlap in text/title tokens via Jaccard similarity
+    t1 = _normalize_text(r1.get("title", ""))
+    t2 = _normalize_text(r2.get("title", ""))
+
+    text1 = r1.get("text", "")
+    text2 = r2.get("text", "")
+
+    # Strict checks first
+    if t1 and t1 == t2 and _normalize_text(text1) and _normalize_text(text1) == _normalize_text(text2):
+        return True
+
+    sim_text = _jaccard_similarity(str(text1 or ""), str(text2 or ""))
+    if sim_text >= threshold:
+        return True
+
+    # If text is missing, fall back to summary/title similarity
+    summary1 = r1.get("summary", "")
+    summary2 = r2.get("summary", "")
+    if (text1 is None or str(text1).strip() == "") and (text2 is None or str(text2).strip() == ""):
+        sim_title = _jaccard_similarity(t1, t2)
+        sim_summary = _jaccard_similarity(summary1, summary2)
+        return max(sim_title, sim_summary) >= max(0.75, threshold - 0.1)
+
+    return False
+
+
+def _dedupe(
+    records: List[Dict[str, Any]],
+    *,
+    similarity_threshold: float = 0.9,
+) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    # Phase 6 duplicate removal:
+    # - Exact dedupe by (source, normalized title, normalized text)
+    # - Then near-duplicate removal using lightweight token overlap (Jaccard).
+    exact_seen = set()
+    deduped: List[Dict[str, Any]] = []
+    duplicates: List[Dict[str, Any]] = []
+
     for r in records:
         source = r.get("source", "")
-        title = r.get("title", "")
-        text = r.get("text", "")
-        key = (source, title, text)
-        if key in seen:
+        title_norm = _normalize_text(r.get("title", ""))
+        text_norm = _normalize_text(r.get("text", ""))
+        exact_key = (source, title_norm, text_norm)
+        if exact_key in exact_seen:
             duplicates.append(r)
             continue
-        seen.add(key)
-        deduped.append(r)
+        exact_seen.add(exact_key)
+
+        # Near-duplicate: compare against current kept records (O(n^2) worst-case)
+        # but dataset sizes are expected to be manageable for offline merging.
+        is_dup = False
+        for kept in deduped:
+            # quick skip: if titles are both present and very different, still allow if text is similar
+            if _looks_like_duplicate(r, kept, threshold=similarity_threshold):
+                is_dup = True
+                break
+
+        if is_dup:
+            duplicates.append(r)
+        else:
+            deduped.append(r)
 
     return deduped, duplicates
+
 
 
 def merge_dataset(cfg: MergeConfig) -> Dict[str, Any]:
