@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.routers.health import router as health_router
+from app.routers.url import router as url_router
 
 app = FastAPI(
     title="SurakshaSathi AI API",
@@ -8,6 +9,7 @@ app = FastAPI(
 )
 
 app.include_router(health_router)
+app.include_router(url_router)
 
 
 @app.get("/")
