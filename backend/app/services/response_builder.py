@@ -9,17 +9,29 @@ class ResponseBuilder:
 
         if confidence >= 80:
             color = "red"
-            recommendation = "🚫 Do NOT trust this message."
+            recommendation = {
+                "en": "Do NOT trust this message.",
+                "hi": "इस संदेश पर भरोसा न करें।",
+                "gu": "આ સંદેશ પર વિશ્વાસ ન કરો."
+            }
             risk = "HIGH"
 
         elif confidence >= 50:
             color = "orange"
-            recommendation = "⚠ Verify before taking action."
+            recommendation = {
+                "en": "Verify before taking action.",
+                "hi": "कार्रवाई करने से पहले सत्यापित करें।",
+                "gu": "કાર્ય કરતા પહેલાં ચકાસો."
+            }
             risk = "MEDIUM"
 
         else:
             color = "green"
-            recommendation = "✅ Appears safe."
+            recommendation = {
+                "en": "Appears safe.",
+                "hi": "यह सुरक्षित लगता है।",
+                "gu": "આ સુરક્ષિત લાગે છે."
+            }
             risk = "LOW"
 
         return {
@@ -27,9 +39,7 @@ class ResponseBuilder:
             "status": "success",
 
             "input": {
-
                 "type": metadata.get("input_type", "text")
-
             },
 
             "result": {
@@ -42,41 +52,22 @@ class ResponseBuilder:
 
                 "headline": details.get("scam_type"),
 
+                # multilingual object
                 "summary": details.get("summary"),
 
                 "recommendation": recommendation
 
             },
 
-            "actions": details.get(
-                "recommended_actions",
-                []
-            ),
+            # multilingual lists
+            "actions": details.get("action_steps", []),
 
-            "red_flags": details.get(
-                "red_flags",
-                []
-            ),
+            "red_flags": details.get("red_flags", []),
 
-            "matched_patterns": details.get(
-                "matched_patterns",
-                []
-            ),
+            "matched_patterns": details.get("matched_patterns", []),
 
             "metadata": metadata or {},
 
-            "technical": {
-
-                "provider": result.get("provider"),
-
-                "model": result.get("model"),
-
-                "response_time_ms": result.get(
-                    "response_time_ms"
-                ),
-
-                "analysis": details
-
-            }
+            "technical": result
 
         }

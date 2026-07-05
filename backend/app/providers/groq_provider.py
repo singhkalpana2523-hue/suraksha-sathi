@@ -37,6 +37,28 @@ class GroqProvider(BaseProvider):
             completion.choices[0].message.content
         )
 
+        required = [
+            "classification",
+            "confidence",
+            "scam_type",
+            "summary",
+            "red_flags",
+            "action_steps"
+        ]
+
+        missing = [
+            field
+            for field in required
+            if field not in result
+        ]
+
+        if missing:
+            raise ValueError(
+                f"Groq returned invalid JSON.\n"
+                f"Missing fields: {missing}\n"
+                f"Response: {result}"
+            )
+
         result["provider"] = "groq"
 
         return AnalysisResponse(**result)

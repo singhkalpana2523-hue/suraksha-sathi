@@ -19,6 +19,7 @@ ai = AIManager()
 
 @router.post("/voice")
 async def analyze_voice(file: UploadFile = File(...)):
+    
 
     suffix = os.path.splitext(file.filename)[1]
 

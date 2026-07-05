@@ -47,7 +47,7 @@ async def analyze_qr(file: UploadFile = File(...)):
 
             "input_type": "qr",
 
-            "qr_type": decoded["qr_type"],
+            "qr_type": decoded.get("qr_type", "QR"),
 
             "decoded_content": decoded["content"]
 
