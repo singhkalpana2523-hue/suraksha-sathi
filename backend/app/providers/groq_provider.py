@@ -3,42 +3,40 @@ import json
 from groq import Groq
 
 from app.config import GROQ_API_KEY
-from app.prompts.prompt_service import SYSTEM_PROMPT
 from app.models.response import AnalysisResponse
+from app.providers.base_provider import BaseProvider
 
 
-client = Groq(api_key=GROQ_API_KEY)
+class GroqProvider(BaseProvider):
 
+    def __init__(self):
+        self.client = Groq(api_key=GROQ_API_KEY)
 
-def analyze_text(text: str):
+    def analyze(self, prompt: str) -> AnalysisResponse:
 
-    completion = client.chat.completions.create(
+        completion = self.client.chat.completions.create(
 
-        model="llama-3.3-70b-versatile",
+            model="llama-3.3-70b-versatile",
 
-        messages=[
-            {
-                "role": "system",
-                "content": SYSTEM_PROMPT
-            },
-            {
-                "role": "user",
-                "content": text
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+
+            temperature=0.2,
+
+            response_format={
+                "type": "json_object"
             }
-        ],
 
-        temperature=0.2,
+        )
 
-        response_format={
-            "type": "json_object"
-        }
+        result = json.loads(
+            completion.choices[0].message.content
+        )
 
-    )
+        result["provider"] = "groq"
 
-    result = completion.choices[0].message.content
-
-    data = json.loads(result)
-
-    data["provider"] = "groq"
-
-    return AnalysisResponse(**data)
+        return AnalysisResponse(**result)
