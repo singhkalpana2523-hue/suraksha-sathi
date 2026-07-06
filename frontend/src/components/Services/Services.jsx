@@ -37,7 +37,10 @@ function Services() {
   ];
 
   return (
-    <section className="bg-slate-950 py-24 text-white">
+    <section
+  id="services"
+  className="bg-slate-950 py-24 text-white"
+>
 
       <div className="max-w-7xl mx-auto px-8">
 
