@@ -3,42 +3,62 @@ import json
 from groq import Groq
 
 from app.config import GROQ_API_KEY
-from app.prompts.prompt_service import SYSTEM_PROMPT
 from app.models.response import AnalysisResponse
+from app.providers.base_provider import BaseProvider
 
 
-client = Groq(api_key=GROQ_API_KEY)
+class GroqProvider(BaseProvider):
 
+    def __init__(self):
+        self.client = Groq(api_key=GROQ_API_KEY)
 
-def analyze_text(text: str):
+    def analyze(self, prompt: str) -> AnalysisResponse:
 
-    completion = client.chat.completions.create(
+        completion = self.client.chat.completions.create(
 
-        model="llama-3.3-70b-versatile",
+            model="llama-3.3-70b-versatile",
 
-        messages=[
-            {
-                "role": "system",
-                "content": SYSTEM_PROMPT
-            },
-            {
-                "role": "user",
-                "content": text
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+
+            temperature=0.2,
+
+            response_format={
+                "type": "json_object"
             }
-        ],
 
-        temperature=0.2,
+        )
 
-        response_format={
-            "type": "json_object"
-        }
+        result = json.loads(
+            completion.choices[0].message.content
+        )
 
-    )
+        required = [
+            "classification",
+            "confidence",
+            "scam_type",
+            "summary",
+            "red_flags",
+            "action_steps"
+        ]
 
-    result = completion.choices[0].message.content
+        missing = [
+            field
+            for field in required
+            if field not in result
+        ]
 
-    data = json.loads(result)
+        if missing:
+            raise ValueError(
+                f"Groq returned invalid JSON.\n"
+                f"Missing fields: {missing}\n"
+                f"Response: {result}"
+            )
 
-    data["provider"] = "groq"
+        result["provider"] = "groq"
 
-    return AnalysisResponse(**data)
+        return AnalysisResponse(**result)

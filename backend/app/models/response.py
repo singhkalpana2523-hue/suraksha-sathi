@@ -1,22 +1,26 @@
-from typing import List, Literal
-from pydantic import BaseModel, Field
+from typing import List
+from pydantic import BaseModel
+
+
+class Translation(BaseModel):
+    en: str
+    hi: str
+    gu: str
 
 
 class AnalysisResponse(BaseModel):
-    provider: str
+    provider: str = "gemini"
 
-    classification: Literal[
-        "SCAM",
-        "SAFE",
-        "SUSPICIOUS"
-    ]
-
-    confidence: int = Field(ge=0, le=100)
-
+    classification: str
+    confidence: int
     scam_type: str
 
-    summary: str
+    summary: Translation
 
-    red_flags: List[str]
+    red_flags: List[Translation]
 
-    action_steps: List[str]
+    action_steps: List[Translation]
+
+    matched_patterns: list = []
+
+    recommended_actions: list = []

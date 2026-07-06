@@ -1,0 +1,87 @@
+[
+  {
+    "id": 1,
+    "title": "RBI KYC Update Scam",
+    "category": "Banking",
+    "subcategory": "KYC",
+    "severity": "High",
+    "language": "English",
+    "text": "Fraudsters send messages claiming your bank KYC has expired and ask you to click a link or install an app. Legitimate banks do not ask customers to update KYC through random SMS or WhatsApp links.",
+    "summary": "Fake KYC verification messages attempt to steal banking credentials.",
+    "red_flags": [
+      "Urgency",
+      "Account suspension warning",
+      "Unknown link",
+      "Request to install APK"
+    ],
+    "recommended_actions": [
+      "Do not click the link.",
+      "Visit your bank's official website.",
+      "Contact the bank using official customer care."
+    ],
+    "keywords": [
+      "KYC",
+      "bank",
+      "blocked",
+      "verify",
+      "account"
+    ],
+    "source": "RBI"
+  },
+
+  {
+    "id": 2,
+    "title": "UPI Collect Request Scam",
+    "category": "UPI",
+    "subcategory": "Collect Request",
+    "severity": "High",
+    "language": "English",
+    "text": "Fraudsters send UPI collect requests claiming they are sending money. Accepting the request actually debits money from your account.",
+    "summary": "UPI collect requests can withdraw money instead of sending it.",
+    "red_flags": [
+      "Unexpected payment request",
+      "Unknown sender",
+      "Urgent payment confirmation"
+    ],
+    "recommended_actions": [
+      "Reject unknown collect requests.",
+      "Verify the sender independently."
+    ],
+    "keywords": [
+      "UPI",
+      "collect",
+      "payment",
+      "Google Pay",
+      "PhonePe"
+    ],
+    "source": "NPCI"
+  },
+
+  {
+    "id": 3,
+    "title": "Digital Arrest Scam",
+    "category": "Law Enforcement",
+    "subcategory": "Fake Police",
+    "severity": "Critical",
+    "language": "English",
+    "text": "Scammers impersonate police or government agencies and falsely claim that the victim is under digital arrest. They demand money to avoid legal action.",
+    "summary": "No law enforcement agency conducts digital arrests over video calls.",
+    "red_flags": [
+      "Police impersonation",
+      "Threat of arrest",
+      "Demand for immediate payment"
+    ],
+    "recommended_actions": [
+      "End the call.",
+      "Report the incident.",
+      "Never transfer money."
+    ],
+    "keywords": [
+      "digital arrest",
+      "CBI",
+      "police",
+      "court"
+    ],
+    "source": "CERT-In"
+  }
+]
