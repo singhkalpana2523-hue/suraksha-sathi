@@ -8,7 +8,6 @@ from typing import Any, Dict, List, Tuple
 
 @dataclass
 class MergeConfig:
-
     input_dir: str
     output_dir: str
     output_filename: str = "scam_dataset.json"
@@ -29,65 +28,90 @@ def _normalize_records(data: Any) -> List[Dict[str, Any]]:
     # Accept either: {"records": [...]} or [...] or single record.
     if data is None:
         return []
+
     if isinstance(data, list):
         return data
+
     if isinstance(data, dict):
         if "records" in data and isinstance(data["records"], list):
             return data["records"]
+
         # If dict looks like a single record
-        if all(k in data for k in ["id", "title", "category", "subcategory", "severity"]):
+        if all(
+            k in data
+            for k in ["id", "title", "category", "subcategory", "severity"]
+        ):
             return [data]
+
     raise ValueError("Unsupported JSON format for records")
 
 
 def _normalize_text(s: Any) -> str:
     if s is None:
         return ""
+
     if not isinstance(s, str):
         s = str(s)
-    # Lowercase + collapse whitespace
+
     return " ".join(s.lower().split())
 
 
 def _jaccard_similarity(a: str, b: str) -> float:
-    # Token-based Jaccard similarity over whitespace tokens.
-    # Lightweight approximation to catch near-duplicates without embeddings.
     ta = set(_normalize_text(a).split())
     tb = set(_normalize_text(b).split())
+
     if not ta and not tb:
         return 1.0
+
     if not ta or not tb:
         return 0.0
+
     inter = len(ta & tb)
     union = len(ta | tb)
+
     return inter / union if union else 0.0
 
 
-def _looks_like_duplicate(r1: Dict[str, Any], r2: Dict[str, Any], *, threshold: float) -> bool:
-    # Dedup logic:
-    # 1) Exact title+text match (after normalization)
-    # 2) High overlap in text/title tokens via Jaccard similarity
+def _looks_like_duplicate(
+    r1: Dict[str, Any],
+    r2: Dict[str, Any],
+    *,
+    threshold: float,
+) -> bool:
+
     t1 = _normalize_text(r1.get("title", ""))
     t2 = _normalize_text(r2.get("title", ""))
 
     text1 = r1.get("text", "")
     text2 = r2.get("text", "")
 
-    # Strict checks first
-    if t1 and t1 == t2 and _normalize_text(text1) and _normalize_text(text1) == _normalize_text(text2):
+    if (
+        t1
+        and t1 == t2
+        and _normalize_text(text1)
+        == _normalize_text(text2)
+    ):
         return True
 
     sim_text = _jaccard_similarity(str(text1 or ""), str(text2 or ""))
+
     if sim_text >= threshold:
         return True
 
-    # If text is missing, fall back to summary/title similarity
     summary1 = r1.get("summary", "")
     summary2 = r2.get("summary", "")
-    if (text1 is None or str(text1).strip() == "") and (text2 is None or str(text2).strip() == ""):
+
+    if (
+        (text1 is None or str(text1).strip() == "")
+        and (text2 is None or str(text2).strip() == "")
+    ):
         sim_title = _jaccard_similarity(t1, t2)
         sim_summary = _jaccard_similarity(summary1, summary2)
-        return max(sim_title, sim_summary) >= max(0.75, threshold - 0.1)
+
+        return max(sim_title, sim_summary) >= max(
+            0.75,
+            threshold - 0.1,
+        )
 
     return False
 
@@ -97,29 +121,37 @@ def _dedupe(
     *,
     similarity_threshold: float = 0.9,
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
-    # Phase 6 duplicate removal:
-    # - Exact dedupe by (source, normalized title, normalized text)
-    # - Then near-duplicate removal using lightweight token overlap (Jaccard).
+
     exact_seen = set()
     deduped: List[Dict[str, Any]] = []
     duplicates: List[Dict[str, Any]] = []
 
     for r in records:
+
         source = r.get("source", "")
         title_norm = _normalize_text(r.get("title", ""))
         text_norm = _normalize_text(r.get("text", ""))
-        exact_key = (source, title_norm, text_norm)
+
+        exact_key = (
+            source,
+            title_norm,
+            text_norm,
+        )
+
         if exact_key in exact_seen:
             duplicates.append(r)
             continue
+
         exact_seen.add(exact_key)
 
-        # Near-duplicate: compare against current kept records (O(n^2) worst-case)
-        # but dataset sizes are expected to be manageable for offline merging.
         is_dup = False
+
         for kept in deduped:
-            # quick skip: if titles are both present and very different, still allow if text is similar
-            if _looks_like_duplicate(r, kept, threshold=similarity_threshold):
+            if _looks_like_duplicate(
+                r,
+                kept,
+                threshold=similarity_threshold,
+            ):
                 is_dup = True
                 break
 
@@ -131,14 +163,22 @@ def _dedupe(
     return deduped, duplicates
 
 
-
 def merge_dataset(cfg: MergeConfig) -> Dict[str, Any]:
     os.makedirs(cfg.output_dir, exist_ok=True)
 
     inputs = [
-        (cfg.rbi_filename, _load_json(os.path.join(cfg.input_dir, cfg.rbi_filename))),
-        (cfg.npci_filename, _load_json(os.path.join(cfg.input_dir, cfg.npci_filename))),
-        (cfg.certin_filename, _load_json(os.path.join(cfg.input_dir, cfg.certin_filename))),
+        (
+            cfg.rbi_filename,
+            _load_json(os.path.join(cfg.input_dir, cfg.rbi_filename)),
+        ),
+        (
+            cfg.npci_filename,
+            _load_json(os.path.join(cfg.input_dir, cfg.npci_filename)),
+        ),
+        (
+            cfg.certin_filename,
+            _load_json(os.path.join(cfg.input_dir, cfg.certin_filename)),
+        ),
         (
             cfg.generated_filename,
             _load_json(os.path.join(cfg.input_dir, cfg.generated_filename)),
@@ -146,18 +186,29 @@ def merge_dataset(cfg: MergeConfig) -> Dict[str, Any]:
     ]
 
     merged_records: List[Dict[str, Any]] = []
+
     for filename, data in inputs:
         records = _normalize_records(data)
-        # Track provenance via source if missing
+
         for r in records:
             r.setdefault("source", filename.replace(".json", ""))
+
         merged_records.extend(records)
 
     deduped, duplicates = _dedupe(merged_records)
 
-    out_path = os.path.join(cfg.output_dir, cfg.output_filename)
+    out_path = os.path.join(
+        cfg.output_dir,
+        cfg.output_filename,
+    )
+
     with open(out_path, "w", encoding="utf-8") as f:
-        json.dump(deduped, f, ensure_ascii=False, indent=2)
+        json.dump(
+            deduped,
+            f,
+            ensure_ascii=False,
+            indent=2,
+        )
 
     return {
         "input_count": len(merged_records),
@@ -168,11 +219,17 @@ def merge_dataset(cfg: MergeConfig) -> Dict[str, Any]:
 
 
 if __name__ == "__main__":
-    # Default paths:
-    # - input: backend/app/dataset/processed/
-    # - output: backend/app/dataset/processed/
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    dataset_dir = os.path.join(base_dir, "app", "dataset", "processed")
+
+    base_dir = os.path.dirname(
+        os.path.dirname(os.path.abspath(__file__))
+    )
+
+    dataset_dir = os.path.join(
+        base_dir,
+        "app",
+        "dataset",
+        "processed",
+    )
 
     cfg = MergeConfig(
         input_dir=dataset_dir,
@@ -181,5 +238,5 @@ if __name__ == "__main__":
     )
 
     result = merge_dataset(cfg)
-    print(json.dumps(result, ensure_ascii=False, indent=2))
 
+    print(json.dumps(result, ensure_ascii=False, indent=2))
