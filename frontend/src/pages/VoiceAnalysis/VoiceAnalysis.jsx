@@ -6,28 +6,44 @@ import Button from "../../components/Button/Button";
 import EmptyState from "../../components/EmptyState/EmptyState";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import ResultCard from "../../components/ResultCard/ResultCard";
+import { analyzeVoice } from "../../services/analysisService";
 
 function VoiceAnalysis() {
 
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  const [result, setResult] = useState(null);
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
 
-    if (!file) {
-      alert("Please upload an audio file first.");
-      return;
-    }
+  if (!file) {
+    alert("Please upload an audio file first.");
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    setTimeout(() => {
-      setLoading(false);
-      setShowResult(true);
-    }, 3000);
+  try {
 
-  };
+    const response = await analyzeVoice(file);
+
+    setResult(response);
+
+    setShowResult(true);
+
+  } catch(err) {
+
+    console.error(err);
+    alert("Voice analysis failed.");
+
+  } finally {
+
+    setLoading(false);
+
+  }
+
+};
 
   return (
     <div className="min-h-screen bg-slate-950 text-white py-16">
@@ -35,7 +51,7 @@ function VoiceAnalysis() {
       <div className="max-w-5xl mx-auto px-6">
 
         <PageHeader
-          title="AI Voice Scam Analyzer"
+          title="Voice Scam Analyzer"
           subtitle="Upload suspicious phone calls or voice messages for AI-powered scam detection."
         />
 
@@ -79,22 +95,7 @@ function VoiceAnalysis() {
 
         ) : showResult ? (
 
-          <ResultCard
-            risk="Medium"
-            score="7.8"
-            category="Voice Phishing"
-            confidence="92%"
-            redFlags={[
-              "Caller demanded urgent payment",
-              "Threatening language detected",
-              "Unknown phone number"
-            ]}
-            recommendations={[
-              "Do not share OTP or bank details.",
-              "Block the number.",
-              "Report the incident."
-            ]}
-          />
+          <ResultCard result={result} />
 
         ) : (
 

@@ -5,27 +5,49 @@ import UploadArea from "../../components/UploadArea/UploadArea";
 import Button from "../../components/Button/Button";
 import EmptyState from "../../components/EmptyState/EmptyState";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
+import ResultCard from "../../components/ResultCard/ResultCard";
+
+import { analyzeImage } from "../../services/analysisService";
 
 function ImageAnalysis() {
 
   const [file, setFile] = useState(null);
 const [loading, setLoading] = useState(false);
 const [showResult, setShowResult] = useState(false);
-const handleAnalyze = () => {
+const [result, setResult] = useState(null);
+const handleAnalyze = async () => {
 
-  if (!file) {
-    alert("Please upload an image first.");
-    return;
-  }
+    if (!file) {
+        alert("Please upload an image first.");
+        return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
-  setTimeout(() => {
+    try {
 
-    setLoading(false);
-    setShowResult(true);
+        const formData = new FormData();
+        formData.append("file", file);
 
-  }, 3000);
+        const response = await analyzeImage(formData);
+
+        console.log(response);
+
+        setResult(response);
+
+        setShowResult(true);
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Image analysis failed.");
+
+    } finally {
+
+        setLoading(false);
+
+    }
 
 };
 
@@ -36,7 +58,7 @@ const handleAnalyze = () => {
       <div className="max-w-5xl mx-auto px-6">
 
         <PageHeader
-          title="AI Image Scam Analyzer"
+          title="Image Scam Analyzer"
           subtitle="Upload screenshots, QR codes and suspicious images to detect online scams."
         />
 
@@ -79,22 +101,7 @@ const handleAnalyze = () => {
 
 ) : showResult ? (
 
-  <ResultCard
-    risk="High"
-    score="9.2"
-    category="QR Code Scam"
-    confidence="95%"
-    redFlags={[
-      "Suspicious QR code detected",
-      "Unknown website",
-      "Payment request"
-    ]}
-    recommendations={[
-      "Do not scan the QR code.",
-      "Verify the sender.",
-      "Report suspicious content."
-    ]}
-  />
+  <ResultCard result={result} />
 
 ) : (
 

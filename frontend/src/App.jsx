@@ -8,6 +8,7 @@ import ImageAnalysis from "./pages/ImageAnalysis/ImageAnalysis";
 import VoiceAnalysis from "./pages/VoiceAnalysis/VoiceAnalysis";
 import History from "./pages/History/History";
 import About from "./pages/About/About";
+import QRAnalysis from "./pages/QRAnalysis/QRAnalysis";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/text-analysis" element={<TextAnalysis />} />
         <Route path="/image-analysis" element={<ImageAnalysis />} />
         <Route path="/voice-analysis" element={<VoiceAnalysis />} />
+        <Route path="/qr" element={<QRAnalysis />}/>
         <Route path="/history" element={<History />} />
         <Route path="/about" element={<About />} />
       </Routes>

@@ -5,6 +5,7 @@ import ResultCard from "../../components/ResultCard/ResultCard";
 import UploadArea from "../../components/UploadArea/UploadArea";
 import PageHeader from "../../components/PageHeader/PageHeader";
 import EmptyState from "../../components/EmptyState/EmptyState";
+import { analyzeText } from "../../services/analysisService";
 
 
 function TextAnalysis() {
@@ -12,7 +13,8 @@ function TextAnalysis() {
 const [text, setText] = useState("");
 const [loading, setLoading] = useState(false);
 const [showResult, setShowResult] = useState(false);
-const handleAnalyze = () => {
+const [result, setResult] = useState(null);
+const handleAnalyze = async () => {
 
   if (text.trim() === "") {
     alert("Please enter a suspicious message first.");
@@ -21,10 +23,24 @@ const handleAnalyze = () => {
 
   setLoading(true);
 
-  setTimeout(() => {
-    setLoading(false);
+  try {
+
+    const response = await analyzeText(text);
+
+    setResult(response);
+
     setShowResult(true);
-  }, 3000);
+
+  } catch (err) {
+
+    console.error(err);
+    alert("Analysis failed.");
+
+  } finally {
+
+    setLoading(false);
+
+  }
 
 };
 
@@ -37,15 +53,11 @@ const handleAnalyze = () => {
         {/* Heading */}
 
         <PageHeader
-    title="AI Text Scam Analyzer"
+    title="Text Scam Analyzer"
     subtitle="Analyze suspicious SMS, Emails, WhatsApp messages and social media conversations using AI."
 />
 
-        <p className="text-center text-slate-400 mt-5 text-lg">
-
-          Analyze suspicious SMS, Emails, WhatsApp messages and social media chats.
-
-        </p>
+         
 
         {/* Input Section */}
 
@@ -83,22 +95,7 @@ const handleAnalyze = () => {
 
 ) : showResult ? (
 
-  <ResultCard
-    risk="High"
-    score="9.5"
-    category="Phishing"
-    confidence="96%"
-    redFlags={[
-      "Urgent payment request",
-      "Suspicious URL",
-      "Unknown sender"
-    ]}
-    recommendations={[
-      "Do not click suspicious links.",
-      "Block the sender.",
-      "Report to cybercrime.gov.in"
-    ]}
-  />
+  <ResultCard result={result} />
 
 ) : (
 

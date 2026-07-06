@@ -1,0 +1,249 @@
+.score-container{
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    position:relative;
+
+    margin:45px 0;
+
+}
+
+.progress-ring{
+
+    transform:rotate(-90deg);
+
+    overflow:visible;
+
+    transition:.5s;
+
+}
+
+.progress-bg{
+
+    opacity:.25;
+
+}
+
+.progress-bar{
+
+    transition:
+        stroke-dashoffset 1s ease,
+        stroke .4s ease;
+
+}
+
+.score-content{
+
+    position:absolute;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+    pointer-events:none;
+
+}
+
+.score-number{
+
+    font-size:3.3rem;
+
+    font-weight:800;
+
+    color:#ffffff;
+
+    line-height:1;
+
+    letter-spacing:-1px;
+
+}
+
+.score-number span{
+
+    font-size:1.4rem;
+
+    font-weight:600;
+
+}
+
+.score-title{
+
+    margin-top:14px;
+
+    color:#cbd5e1;
+
+    font-size:1rem;
+
+    font-weight:600;
+
+    letter-spacing:.6px;
+
+}
+
+.score-risk{
+
+    margin-top:12px;
+
+    font-size:1rem;
+
+    font-weight:700;
+
+    letter-spacing:.8px;
+
+}
+
+.score-container:hover .progress-ring{
+
+    transform:rotate(-90deg) scale(1.04);
+
+}
+
+.score-container:hover{
+
+    transition:.3s;
+
+}
+
+.progress-ring circle{
+
+    transform-origin:center;
+
+}
+
+@keyframes pulseGlow{
+
+    0%{
+
+        filter:brightness(1);
+
+    }
+
+    50%{
+
+        filter:brightness(1.12);
+
+    }
+
+    100%{
+
+        filter:brightness(1);
+
+    }
+
+}
+
+.progress-bar{
+
+    animation:pulseGlow 2.2s infinite;
+
+}
+
+/* ---------- Tablet ---------- */
+
+@media(max-width:900px){
+
+.progress-ring{
+
+    width:190px;
+
+    height:190px;
+
+}
+
+.score-number{
+
+    font-size:2.8rem;
+
+}
+
+.score-title{
+
+    font-size:.95rem;
+
+}
+
+.score-risk{
+
+    font-size:.95rem;
+
+}
+
+}
+
+/* ---------- Mobile ---------- */
+
+@media(max-width:600px){
+
+.progress-ring{
+
+    width:160px;
+
+    height:160px;
+
+}
+
+.score-number{
+
+    font-size:2.3rem;
+
+}
+
+.score-number span{
+
+    font-size:1.1rem;
+
+}
+
+.score-title{
+
+    font-size:.85rem;
+
+}
+
+.score-risk{
+
+    font-size:.85rem;
+
+}
+
+}
+.progress-bar{
+
+    animation:
+        pulseRing 2s ease-in-out infinite;
+
+}
+
+@keyframes pulseRing{
+
+    0%{
+
+        opacity:.9;
+
+    }
+
+    50%{
+
+        opacity:1;
+
+    }
+
+    100%{
+
+        opacity:.9;
+
+    }
+
+}
