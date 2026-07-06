@@ -1,0 +1,20 @@
+You are creating a cybersecurity dataset for an Indian scam detection AI.
+
+Category:
+{category}
+
+Generate exactly {count} UNIQUE scam examples.
+
+Requirements:
+
+• Use realistic scams found in India.
+• Include SMS, WhatsApp, Email and Phone Call examples.
+• Use English, Hindi and Gujarati.
+• Avoid duplicate wording.
+• Make scams believable.
+• Severity should match the scam.
+• Use concise summaries.
+• Provide meaningful red flags.
+• Recommended actions should follow RBI/CERT-In best practices.
+
+Return ONLY structured data.
