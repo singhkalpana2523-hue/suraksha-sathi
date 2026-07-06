@@ -15,7 +15,11 @@ class AIManager:
         self.secondary = GroqProvider()
         self.rag = get_default_rag_service()
 
-    def build_prompt(self, text: str):
+    def build_prompt(
+    self,
+    text: str,
+    url_context: str = ""
+):
 
         matches = self.rag.search(text)
 
@@ -153,10 +157,16 @@ Rules:
 
         return prompt, matched_patterns
 
-    def analyze(self, text: str):
+    def analyze(
+    self,
+    text: str,
+    url_context: str = ""
+):
 
-        prompt, matched_patterns = self.build_prompt(text)
-
+        prompt, matched_patterns = self.build_prompt(
+    text,
+    url_context
+)
         start = time.time()
 
         try:
