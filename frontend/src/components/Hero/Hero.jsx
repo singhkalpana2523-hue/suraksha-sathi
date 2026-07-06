@@ -1,6 +1,9 @@
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 function Hero() {
+  const navigate = useNavigate();
+
   return (
     <section className="min-h-[90vh] flex items-center bg-slate-950 text-white">
 
@@ -43,16 +46,30 @@ function Hero() {
 
           <div className="flex gap-5 mt-10">
 
-            <button className="bg-cyan-500 hover:bg-cyan-600 px-8 py-4 rounded-xl font-semibold transition">
+            {/* Analyze Button */}
 
+            <button
+              onClick={() => {
+  const section = document.getElementById("services");
+
+  if (section) {
+    section.scrollIntoView({
+      behavior: "smooth",
+    });
+  }
+}}
+              className="bg-cyan-500 hover:bg-cyan-600 px-8 py-4 rounded-xl font-semibold transition duration-300"
+            >
               Analyze Now
-
             </button>
 
-            <button className="border border-cyan-500 px-8 py-4 rounded-xl hover:bg-cyan-500 transition">
+            {/* Learn More Button */}
 
+            <button
+              onClick={() => navigate("/about")}
+              className="border border-cyan-500 px-8 py-4 rounded-xl hover:bg-cyan-500 hover:text-black transition duration-300"
+            >
               Learn More
-
             </button>
 
           </div>
@@ -62,15 +79,10 @@ function Hero() {
         {/* Right */}
 
         <motion.div
-
           initial={{ opacity: 0, x: 80 }}
-
           animate={{ opacity: 1, x: 0 }}
-
           transition={{ duration: 1 }}
-
           className="flex justify-center"
-
         >
 
           <div className="w-96 h-96 rounded-full bg-cyan-500/20 flex items-center justify-center shadow-[0_0_120px_20px_rgba(6,182,212,0.35)]">

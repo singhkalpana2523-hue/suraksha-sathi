@@ -3,15 +3,22 @@ import PageHeader from "../../components/PageHeader/PageHeader";
 function About() {
 
   const technologies = [
-    "React",
-    "Node.js",
-    "Express.js",
-    "MongoDB",
-    "Python",
-    "Gemini AI",
-    "Tailwind CSS",
-    "FAST APIs"
-  ];
+  "React.js",
+  "Vite",
+  "CSS3",
+  "React Router",
+  "Python",
+  "FastAPI",
+  "Gemini AI",
+  "RAG",
+  "FAISS",
+  "MongoDB",
+  "JWT Authentication",
+  "OCR",
+  "QR Detection",
+  "URL Phishing Analysis",
+  "Speech-to-Text"
+];
 
   return (
 
@@ -21,7 +28,7 @@ function About() {
 
         <PageHeader
           title="About SurakshaSathi"
-          subtitle="An AI-powered platform that helps users detect and prevent online scams using Text, Image and Voice analysis."
+          subtitle="SurakshaSathi is an AI-powered cybersecurity platform that helps users identify online scams through Text, Image, Voice and URL analysis. It leverages Large Language Models (Gemini AI), Retrieval-Augmented Generation (RAG), OCR, QR code detection and phishing analysis to provide accurate risk assessment and actionable safety recommendations."
         />
 
         {/* Mission */}
@@ -74,7 +81,7 @@ function About() {
 
           <h2 className="text-3xl font-bold text-cyan-400 mb-6">
 
-            ⚙ Technologies Used
+            ⚙ Tech Stack
 
           </h2>
 

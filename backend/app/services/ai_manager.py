@@ -15,7 +15,11 @@ class AIManager:
         self.secondary = GroqProvider()
         self.rag = get_default_rag_service()
 
-    def build_prompt(self, text: str):
+    def build_prompt(
+    self,
+    text: str,
+    url_context: str = ""
+):
 
         matches = self.rag.search(text)
 
@@ -58,77 +62,119 @@ Similarity:
         prompt = f"""
 You are SurakshaSathi.
 
-You are an expert AI that detects financial scams.
+You are an expert AI that detects online scams.
 
-Use the scam knowledge below while analyzing the user's message.
+Use the retrieved scam knowledge below while analysing the user's message.
 
-=====================
-Retrieved Knowledge
-=====================
+==========================
+Retrieved Scam Knowledge
+==========================
 
 {knowledge}
 
-=====================
+==========================
 User Message
-=====================
+==========================
 
 {text}
 
 Return ONLY valid JSON.
 
 {{
-    "classification":"SCAM",
-    "confidence":95,
-    "scam_type":"Phishing",
+  "classification":"SCAM | SUSPICIOUS | SAFE",
 
-    "summary":{{
-        "en":"Short sentence",
-        "hi":"छोटा वाक्य",
-        "gu":"ટૂંકું વાક્ય"
-    }},
+  "confidence":95,
 
-    "red_flags":[
-        {{
-            "en":"Fake Link",
-            "hi":"फर्जी लिंक",
-            "gu":"નકલી લિંક"
-        }}
-    ],
+  "scam_type":"Phishing",
 
-    "action_steps":[
-        {{
-            "en":"Don't Click",
-            "hi":"क्लिक मत करें",
-            "gu":"ક્લિક કરશો નહીં"
-        }}
-    ]
+  "summary":{{
+      "en":"Fake SBI KYC message.",
+      "hi":"फर्जी SBI KYC संदेश।",
+      "gu":"નકલી SBI KYC સંદેશ."
+  }},
+
+  "red_flags":[
+      {{
+          "en":"Fake Link",
+          "hi":"फर्जी लिंक",
+          "gu":"નકલી લિંક"
+      }},
+      {{
+          "en":"Urgent Request",
+          "hi":"तुरंत कार्यवाही",
+          "gu":"તાત્કાલિક કાર્યવાહી"
+      }},
+      {{
+          "en":"Unknown Sender",
+          "hi":"अज्ञात प्रेषक",
+          "gu":"અજાણ્યો મોકલનાર"
+      }},
+      {{
+          "en":"Requests OTP",
+          "hi":"OTP मांगता है",
+          "gu":"OTP માંગે છે"
+      }}
+  ],
+
+  "action_steps":[
+      {{
+          "en":"Ignore Message",
+          "hi":"संदेश अनदेखा करें",
+          "gu":"સંદેશ અવગણો"
+      }},
+      {{
+          "en":"Don't Click",
+          "hi":"लिंक न खोलें",
+          "gu":"લિંક ન ખોલો"
+      }},
+      {{
+          "en":"Call Bank",
+          "hi":"बैंक से संपर्क करें",
+          "gu":"બેંકમાં ફોન કરો"
+      }},
+      {{
+          "en":"Report 1930",
+          "hi":"1930 पर रिपोर्ट करें",
+          "gu":"1930 પર ફરિયાદ કરો"
+      }}
+  ]
 }}
 
 Rules:
 
 1. Return ONLY JSON.
-2. No markdown.
-3. confidence = integer (0-100).
-4. summary = one short sentence.
-5. red_flags = max 4 items.
-6. action_steps = max 4 items.
+2. Never use markdown.
+3. confidence must be an integer between 0 and 100.
+4. summary must be ONE sentence (maximum 10 words).
+5. scam_type must contain at most 3 words.
+6. red_flags must contain exactly 4 short items.
+7. action_steps must contain exactly 4 short items.
+8. Translate summary, red_flags and action_steps into:
+   - English
+   - Hindi
+   - Gujarati
 """
 
         return prompt, matched_patterns
 
-    def analyze(self, text: str):
+    def analyze(
+    self,
+    text: str,
+    url_context: str = ""
+):
 
-        prompt, matched_patterns = self.build_prompt(text)
-
+        prompt, matched_patterns = self.build_prompt(
+    text,
+    url_context
+)
         start = time.time()
-
-        response = None
 
         try:
 
             logger.info("Using Gemini")
 
-            response = self.secondary.analyze(prompt)
+            # PRIMARY MODEL
+            response = self.primary.analyze(prompt)
 
         except Exception as gemini_error:
 
@@ -138,12 +184,12 @@ Rules:
 
             try:
 
+                # FALLBACK MODEL
                 response = self.secondary.analyze(prompt)
 
             except Exception as groq_error:
 
                 logger.exception(f"Groq also failed: {groq_error}")
-
                 raise
 
         elapsed = int((time.time() - start) * 1000)

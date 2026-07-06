@@ -1,0 +1,290 @@
+/* ===========================
+   Share Modal Overlay
+=========================== */
+
+.share-overlay{
+
+        position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .65);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    backdrop-filter: blur(5px);
+
+    
+
+}
+
+/* ===========================
+   Modal
+=========================== */
+
+.share-modal{
+
+    width:min(92%,650px);
+
+    max-height:85vh;
+
+    overflow-y:auto;
+
+    background:rgba(31,41,55,.96);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:24px;
+
+    padding:28px;
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.45),
+        0 0 35px rgba(6,182,212,.15);
+
+    animation:popup .3s ease;
+
+}
+
+/* ===========================
+   Header
+=========================== */
+
+.share-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:25px;
+
+}
+
+.share-header h2{
+
+    color:white;
+
+    font-size:1.7rem;
+
+    font-weight:700;
+
+}
+
+.close-modal{
+
+    width:42px;
+
+    height:42px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:#334155;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-size:1rem;
+
+    transition:.25s;
+
+}
+
+.close-modal:hover{
+
+    background:#ef4444;
+
+    transform:rotate(90deg);
+
+}
+
+/* ===========================
+   Grid
+=========================== */
+
+.share-options{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:18px;
+
+}
+
+/* ===========================
+   Option Card
+=========================== */
+
+.share-option{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+
+    width:100%;
+
+    border:none;
+
+    border-radius:18px;
+
+    padding:18px;
+
+    cursor:pointer;
+
+    text-align:left;
+
+    color:white;
+
+    background:rgba(51,65,85,.75);
+
+    border:1px solid rgba(255,255,255,.05);
+
+    transition:.3s;
+
+}
+
+.share-option:hover{
+
+    transform:translateY(-6px);
+
+    border-color:#06b6d4;
+
+    box-shadow:
+
+        0 0 20px rgba(6,182,212,.18),
+
+        0 15px 30px rgba(0,0,0,.25);
+
+}
+
+.share-option span{
+
+    font-size:2rem;
+
+    flex-shrink:0;
+
+}
+
+.share-option h3{
+
+    font-size:1rem;
+
+    margin-bottom:4px;
+
+    color:white;
+
+}
+
+.share-option p{
+
+    color:#cbd5e1;
+
+    font-size:.88rem;
+
+    line-height:1.4;
+
+}
+
+/* ===========================
+   Scrollbar
+=========================== */
+
+.share-modal::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+.share-modal::-webkit-scrollbar-thumb{
+
+    background:#475569;
+
+    border-radius:10px;
+
+}
+
+/* ===========================
+   Animations
+=========================== */
+
+@keyframes popup{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(25px) scale(.95);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0) scale(1);
+
+    }
+
+}
+
+@keyframes fadeIn{
+
+    from{
+
+        opacity:0;
+
+    }
+
+    to{
+
+        opacity:1;
+
+    }
+
+}
+
+/* ===========================
+   Mobile
+=========================== */
+
+@media(max-width:768px){
+
+.share-modal{
+
+    width:95%;
+
+    padding:22px;
+
+}
+
+.share-options{
+
+    grid-template-columns:1fr;
+
+}
+
+.share-option{
+
+    padding:16px;
+
+}
+
+.share-option span{
+
+    font-size:1.8rem;
+
+}
+
+.share-header h2{
+
+    font-size:1.4rem;
+
+}
+
+}

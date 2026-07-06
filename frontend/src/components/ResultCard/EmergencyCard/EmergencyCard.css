@@ -1,0 +1,287 @@
+/* ===========================
+   Emergency Section
+=========================== */
+
+.emergency-section{
+
+    width:100%;
+
+    margin-top:45px;
+
+}
+
+.emergency-section h2{
+
+    color:white;
+
+    font-size:1.7rem;
+
+    font-weight:700;
+
+    margin-bottom:22px;
+
+}
+
+/* ===========================
+   Cards Grid
+=========================== */
+
+.emergency-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:20px;
+
+}
+
+/* ===========================
+   Emergency Card
+=========================== */
+
+.emergency-card{
+
+    background:rgba(38,48,70,.85);
+
+    backdrop-filter:blur(14px);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:18px;
+
+    padding:24px;
+
+    cursor:pointer;
+
+    transition:.35s ease;
+
+    text-align:center;
+
+    box-shadow:0 8px 22px rgba(0,0,0,.18);
+
+}
+
+.emergency-card:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:
+        0 0 18px rgba(6,182,212,.25),
+        0 12px 35px rgba(0,0,0,.35);
+
+    border-color:#06b6d4;
+
+}
+
+.emoji{
+
+    font-size:2.6rem;
+
+    margin-bottom:12px;
+
+}
+
+.emergency-card h3{
+
+    color:white;
+
+    font-size:1.2rem;
+
+    margin-bottom:8px;
+
+}
+
+.emergency-card p{
+
+    color:#cbd5e1;
+
+    font-size:.95rem;
+
+    line-height:1.5;
+
+}
+
+/* ===========================
+   Bank Modal
+=========================== */
+
+.bank-modal{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.65);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:999;
+
+    backdrop-filter:blur(5px);
+
+}
+
+.bank-box{
+
+    width:min(92%,500px);
+
+    background:#20283a;
+
+    border-radius:22px;
+
+    padding:28px;
+
+    box-shadow:0 20px 45px rgba(0,0,0,.45);
+
+    animation:popup .25s ease;
+
+}
+
+.bank-box h2{
+
+    color:white;
+
+    text-align:center;
+
+    margin-bottom:22px;
+
+}
+
+/* ===========================
+   Bank Buttons
+=========================== */
+
+.bank-btn{
+
+    width:100%;
+
+    padding:14px;
+
+    margin-bottom:12px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#2c3b56;
+
+    color:white;
+
+    font-size:1rem;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.bank-btn:hover{
+
+    background:#06b6d4;
+
+    color:white;
+
+    transform:translateX(6px);
+
+}
+
+/* ===========================
+   Close Button
+=========================== */
+
+.close-btn{
+
+    width:100%;
+
+    margin-top:15px;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#ef4444;
+
+    color:white;
+
+    font-size:1rem;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.close-btn:hover{
+
+    background:#dc2626;
+
+}
+
+/* ===========================
+   Popup Animation
+=========================== */
+
+@keyframes popup{
+
+    from{
+
+        opacity:0;
+
+        transform:scale(.9);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:scale(1);
+
+    }
+
+}
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media(max-width:768px){
+
+.emergency-grid{
+
+    grid-template-columns:1fr;
+
+}
+
+.emergency-card{
+
+    padding:20px;
+
+}
+
+.emoji{
+
+    font-size:2.2rem;
+
+}
+
+.emergency-card h3{
+
+    font-size:1.05rem;
+
+}
+
+.bank-box{
+
+    padding:22px;
+
+}
+
+}
